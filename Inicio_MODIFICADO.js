@@ -327,7 +327,6 @@ function renderData() {
     } else {
         renderAvisosPlanificacionTable();
         renderAvisosData();
-        renderAvisosAtrasadosTable();
         renderAvisosChart();
         document.getElementById('avisosSection').classList.remove('hidden');
     }
@@ -957,7 +956,6 @@ function renderAvisosData() {
                 <tr>
                     <th>Semana</th>
                     <th>Grupo</th>
-                    <th>Encargado</th>
                     ${sistemasOrdenados.map(sis => `<th>${sis}</th>`).join('')}
                     <th>Total</th>
                 </tr>
@@ -975,14 +973,10 @@ function renderAvisosData() {
             totalSemana += sistemaData.count;
         });
         
-        // Convertir Set de encargados a array y unir con comas
-        const encargadosTexto = Array.from(semanaData.encargados).join(', ') || 'N/A';
-        
         tableHTML += `
             <tr>
                 <td>${semana}</td>
                 <td>${semanaData.grupo}</td>
-                <td style="text-align: left; max-width: 200px; word-wrap: break-word;">${encargadosTexto}</td>
                 ${sistemasOrdenados.map(sis => {
                     const sistemaData = semanaData.sistemas[sis];
                     const count = sistemaData ? sistemaData.count : 0;
@@ -1016,7 +1010,6 @@ function renderAvisosData() {
     tableHTML += `
             <tr style="font-weight: bold; background: #f0f0f0;">
                 <td>Total general</td>
-                <td></td>
                 <td></td>
                 ${sistemasOrdenados.map(sis => `<td>${totalesPorSistema[sis]}</td>`).join('')}
                 <td>${granTotal}</td>
@@ -1341,7 +1334,6 @@ function renderAvisosPlanificacionTable() {
                     <th>Período</th>
                     <th>Total avisos</th>
                     <th>Atrasados</th>
-                    <th>% Atrasados</th>
                 </tr>
             </thead>
             <tbody>
@@ -1350,74 +1342,24 @@ function renderAvisosPlanificacionTable() {
                     <td>${displayTitle}</td>
                     <td>${totalELE}</td>
                     <td class="status-metr">${atrasadosELE}</td>
-                    <td>${porcentajeELE}%</td>
                 </tr>
                 <tr>
                     <td>ETN</td>
                     <td>${displayTitle}</td>
                     <td>${totalETN}</td>
                     <td class="status-metr">${atrasadosETN}</td>
-                    <td>${porcentajeETN}%</td>
                 </tr>
                 <tr style="font-weight: bold; background: #f0f0f0;">
                     <td>Total general</td>
                     <td></td>
                     <td>${totalGeneral}</td>
                     <td>${atrasadosELE + atrasadosETN}</td>
-                    <td>${totalPorcentaje}%</td>
                 </tr>
             </tbody>
         </table>
     `;
     
     document.getElementById('avisosPlanificacionTable').innerHTML = tableHTML;
-}
-
-function renderAvisosAtrasadosTable() {
-    const sortedWeeks = Object.keys(weeklySummary).sort((a, b) => parseInt(a) - parseInt(b));
-    
-    let tableHTML = `
-        <table class="summary-table">
-            <thead>
-                <tr>
-                    <th></th>
-                    ${sortedWeeks.map(week => `<th>Semana ${week}</th>`).join('')}
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Atrasados ELE</td>
-                    ${sortedWeeks.map(week => `<td>${weeklySummary[week].atrasadosELE}</td>`).join('')}
-                </tr>
-                <tr>
-                    <td>Total ELE</td>
-                    ${sortedWeeks.map(week => `<td>${weeklySummary[week].totalELE}</td>`).join('')}
-                </tr>
-                <tr>
-                    <td>% Atrasados ELE</td>
-                    ${sortedWeeks.map(week => `<td>${weeklySummary[week].porcentajeELE}%</td>`).join('')}
-                </tr>
-                <tr>
-                    <td>Atrasados ETN</td>
-                    ${sortedWeeks.map(week => `<td>${weeklySummary[week].atrasadosETN}</td>`).join('')}
-                </tr>
-                <tr>
-                    <td>Total ETN</td>
-                    ${sortedWeeks.map(week => `<td>${weeklySummary[week].totalETN}</td>`).join('')}
-                </tr>
-                <tr>
-                    <td>% Atrasados ETN</td>
-                    ${sortedWeeks.map(week => `<td>${weeklySummary[week].porcentajeETN}%</td>`).join('')}
-                </tr>
-                <tr style="font-weight: bold;">
-                    <td>TOTAL %</td>
-                    ${sortedWeeks.map(week => `<td>${weeklySummary[week].totalPorcentaje}%</td>`).join('')}
-                </tr>
-            </tbody>
-        </table>
-    `;
-    
-    document.getElementById('avisosAtrasadosTable').innerHTML = tableHTML;
 }
 
 function renderAvisosChart() {
