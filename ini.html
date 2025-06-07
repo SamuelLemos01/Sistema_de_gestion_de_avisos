@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Mantenimiento | Argos Colombia</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="inicio.css">
+</head>
+<body>
+    <div class="main-layout">
+        <div class="container">
+            <div class="header">
+                <div class="header-content">
+                    <div class="logo-section">
+                        <img src="assets/logo.png" alt="Argos Logo" class="logo">
+                    </div>
+                    <div class="title-section">
+                        <h1>Dashboard de Mantenimiento</h1>
+                        <p>Sistema de gestión de avisos</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="file-input-section">
+                <h3>Cargar Archivo de Datos</h3>
+                <div class="file-input">
+                    <label>Seleccione el archivo (abril.xlsx o avisos.xlsx):</label>
+                    <input type="file" id="csvFile" accept=".csv,.xlsx">
+                </div>
+                <button onclick="processFile()" class="btn-primary">Procesar Archivo</button>
+            </div>
+            
+            <!-- Sección para mostrar datos crudos -->
+            <div id="rawDataSection" class="panel hidden">
+                <h2>Datos Crudos</h2>
+                <div id="rawDataTable"></div>
+            </div>
+            
+            <!-- Sección para datos de abril.csv -->
+            <div id="abrilSection" class="panel hidden">
+                <div class="filter-section">
+                    <label for="monthFilter">Filtrar por mes (solo para Resumen por Estado):</label>
+                    <select id="monthFilter" onchange="filterByMonth()">
+                        <option value="todos">Todos los meses</option>
+                        <!-- Las opciones se llenarán dinámicamente -->
+                    </select>
+                </div>
+                
+                <h2>Resumen por Estado del Sistema</h2>
+                <div id="abrilStatusTable"></div>
+                
+                <h2>Resumen de Cierres</h2>
+                <div id="abrilSummaryTable"></div>
+                
+                <h2>Avisos Cerrados - Gráfico</h2>
+                <div class="chart-container">
+                    <canvas id="abrilChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Sección para datos de avisos.csv -->
+            <div id="avisosSection" class="panel hidden">
+                <div class="filter-section">
+                    <label for="avisosWeekFilter">Filtrar por semana:</label>
+                    <select id="avisosWeekFilter" onchange="filterAvisosByWeek()">
+                        <option value="todos">Todas las semanas</option>
+                        <!-- Las opciones se llenarán dinámicamente -->
+                    </select>
+                    
+                    <label for="avisosEncargadoFilter">Filtrar por encargado:</label>
+                    <select id="avisosEncargadoFilter" onchange="filterAvisosByWeek()">
+                        <option value="todos">Todos los encargados</option>
+                        <!-- Las opciones se llenarán dinámicamente -->
+                    </select>
+                </div>
+                
+                <h2>Resumen por Planificación</h2>
+                <div id="avisosPlanificacionTable"></div>
+                
+                <h2>Resumen por Sistemas</h2>
+                <div id="avisosTable"></div>
+                
+                <h2>Resumen de Atrasados</h2>
+                <div id="avisosAtrasadosTable"></div>
+                
+                <h2>Atrasados por Encargados - Gráfico</h2>
+                <div class="chart-container">
+                    <canvas id="avisosChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="Inicio_MODIFICADO.js"></script>
+</body>
+</html>
