@@ -40,11 +40,9 @@ function processXLSXFile(file) {
             const data = new Uint8Array(e.target.result);
             const workbook = XLSX.read(data, { type: 'array' });
             
-            // Tomar la primera hoja
             const firstSheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[firstSheetName];
             
-            // Convertir a JSON
             const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
             
             if (jsonData.length === 0) {
@@ -52,7 +50,6 @@ function processXLSXFile(file) {
                 return;
             }
             
-            // Convertir a formato similar al CSV (primera fila como headers)
             const headers = jsonData[0];
             const rows = jsonData.slice(1);
             
@@ -62,14 +59,30 @@ function processXLSXFile(file) {
                     obj[header] = row[index] || '';
                 });
                 return obj;
-            }).filter(row => Object.values(row).some(val => val && val.toString().trim()));
+            }).filter(row => {
+                return Object.values(row).some(val => val && val.toString().trim() !== '');
+            });
             
-            // Procesar los datos
-            organizeDataByMonth();
-            calculateMonthlySummaries();
+            console.log('Datos XLSX cargados:', currentData.length, 'registros');
+            console.log('Muestra de datos:', currentData.slice(0, 3));
+            
+            if (currentData.length === 0) {
+                alert('El archivo XLSX no contiene datos válidos');
+                return;
+            }
+            
+            if (fileType === 'abril') {
+                organizeDataByMonth();
+                calculateMonthlySummaries();
+            } else {
+                organizeAvisosByWeek();
+                calculateWeeklySummaries();
+            }
+            
             renderData();
             
         } catch (error) {
+            console.error('Error al procesar XLSX:', error);
             alert(`Error al procesar el archivo XLSX: ${error.message}`);
         }
     };
@@ -85,15 +98,56 @@ function processXLSXFile(file) {
 function processCSVFile(file) {
     Papa.parse(file, {
         header: true,
-        delimiter: ';',
+        delimiter: '',
+        skipEmptyLines: 'greedy',
+        encoding: 'UTF-8',
+        dynamicTyping: false,
         complete: function(results) {
-            currentData = results.data.filter(row => Object.values(row).some(val => val));
-            organizeDataByMonth();
-            calculateMonthlySummaries();
+            console.log('Datos CSV cargados:', results.data.length, 'registros');
+            console.log('Headers detectados:', results.meta.fields);
+            
+            if (results.errors && results.errors.length > 0) {
+                console.warn('Errores en CSV:', results.errors);
+            }
+            
+            currentData = results.data.filter(row => {
+                return Object.values(row).some(val => val && val.toString().trim() !== '');
+            });
+            
+            console.log('Datos filtrados:', currentData.length, 'registros');
+            console.log('Muestra de datos:', currentData.slice(0, 3));
+            
+            if (currentData.length === 0) {
+                alert('El archivo CSV está vacío o no contiene datos válidos.\nVerifique que el archivo tenga la estructura correcta.');
+                return;
+            }
+            
+            const requiredColumns = fileType === 'abril' 
+                ? ['Fecha de aviso', 'Grupo planif.', 'Status sistema'] 
+                : ['Semana', 'Sistema', 'Grupo planif.', 'Encargado', 'atrasados'];
+            
+            const missingColumns = requiredColumns.filter(col => 
+                !results.meta.fields || !results.meta.fields.includes(col)
+            );
+            
+            if (missingColumns.length > 0) {
+                alert(`Faltan columnas requeridas en el archivo CSV: ${missingColumns.join(', ')}\n\nColumnas disponibles: ${results.meta.fields ? results.meta.fields.join(', ') : 'No detectadas'}`);
+                return;
+            }
+            
+            if (fileType === 'abril') {
+                organizeDataByMonth();
+                calculateMonthlySummaries();
+            } else {
+                organizeAvisosByWeek();
+                calculateWeeklySummaries();
+            }
+            
             renderData();
         },
         error: function(error) {
-            alert(`Error al procesar el archivo CSV: ${error.message}`);
+            console.error('Error al procesar CSV:', error);
+            alert(`Error al procesar el archivo CSV: ${error.message}\n\nSugerencias:\n- Verifique que el archivo esté en formato UTF-8\n- Asegúrese de que use delimitadores estándar (coma o punto y coma)\n- Revise que no haya caracteres especiales en los headers`);
         }
     });
 }
@@ -261,23 +315,16 @@ function filterByMonth() {
 }
 
 function renderData() {
-    // Ocultar todas las secciones primero
     document.getElementById('abrilSection').classList.add('hidden');
     document.getElementById('avisosSection').classList.add('hidden');
     document.getElementById('rawDataSection').classList.add('hidden');
     
     if (fileType === 'abril') {
-        // Mostrar datos iniciales (todos los meses)
-        organizeDataByMonth();
-        calculateMonthlySummaries();
         renderStatusTable(currentData);
         renderSummaryTable();
         renderChart();
         document.getElementById('abrilSection').classList.remove('hidden');
     } else {
-        // Procesar datos de avisos
-        organizeAvisosByWeek();
-        calculateWeeklySummaries();
         renderAvisosPlanificacionTable();
         renderAvisosData();
         renderAvisosAtrasadosTable();
@@ -285,7 +332,6 @@ function renderData() {
         document.getElementById('avisosSection').classList.remove('hidden');
     }
     
-    // Mostrar datos crudos en ambos casos
     renderRawData();
     document.getElementById('rawDataSection').classList.remove('hidden');
 }

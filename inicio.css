@@ -695,3 +695,66 @@ tr:hover {
         background: rgba(255, 255, 255, 0.05);
     }
 }
+
+.footer {
+    background: linear-gradient(135deg, #071D49 0%, #0A2555 100%);
+    color: white;
+    text-align: center;
+    padding: 25px 20px;
+    margin-top: 40px;
+    border-top: 4px solid #C4D600;
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+}
+
+.footer-content {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.footer-content p {
+    margin: 8px 0;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.footer-content p:first-child {
+    font-size: 16px;
+    margin-bottom: 12px;
+}
+
+.footer-content strong {
+    color: #C4D600;
+    font-weight: 600;
+}
+
+.github-link {
+    margin-top: 15px;
+}
+
+.github-link a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    border: 2px solid #C4D600;
+    border-radius: 8px;
+    background: rgba(196, 214, 0, 0.1);
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.github-link a:hover {
+    background: #C4D600;
+    color: #071D49;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(196, 214, 0, 0.3);
+}
+
+.github-icon {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
